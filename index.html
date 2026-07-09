@@ -42,11 +42,13 @@
   <meta name="theme-color" content="#005CAA">
 
   <!-- PERF: preconnect/dns-prefetch ke semua host eksternal yang dipakai
-       (CDN CSS/JS). Ini bikin browser mulai proses DNS+TLS handshake ke
-       host-host ini SEJAJAR dengan parsing <head>, bukan baru mulai
-       satu-satu saat masing-masing <link>/<script> ditemukan. -->
+       (CDN CSS/JS + backend RPC). script.google.com PALING penting di sini
+       — SETIAP panggilan RPC menuju ke situ, jadi preconnect ini langsung
+       memangkas waktu DNS+TLS dari request RPC PERTAMA (login/restore sesi). -->
+  <link rel="preconnect" href="https://script.google.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="dns-prefetch" href="https://script.google.com">
   <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
   <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
 
@@ -5462,6 +5464,10 @@ function performClientLogout() {
   stopIdleTimer();
   _lastDataSnapshot = null;
   _lastKnownDataVersion = null;
+  // Bersihkan cache data lokal punya user ini (lihat mSaveDataCache_) SEBELUM
+  // STATE.username di-null-kan di bawah — penting untuk device yang dipakai
+  // bergantian oleh lebih dari satu orang.
+  mClearDataCacheForCurrentUser_();
   STATE.username = null;
   STATE.displayName = null;
   STATE.sessionToken = null;
@@ -5958,6 +5964,20 @@ function initApp() {
   go('dashboard');
   mGo('home');
   refreshAdminMsgs_();
+
+  // PERFORMA (stale-while-revalidate): kalau ada data hasil load TERAKHIR
+  // kali app ini dibuka (disimpan di localStorage — lihat mSaveDataCache_ di
+  // applyLoadedData), tampilkan dulu SEKARANG JUGA — user langsung lihat
+  // angka, bukan dashboard kosong sambil nunggu network. Begitu request ke
+  // server di bawah selesai, data ini otomatis ditimpa dengan yang segar
+  // (applyLoadedData dipanggil lagi, idempotent, tidak masalah dipanggil 2x).
+  var cached = mLoadDataCache_(STATE.year);
+  if (cached) {
+    applyLoadedData(cached);
+    go('dashboard');
+    renderMobileHome();
+  }
+
   google.script.run
     .withSuccessHandler(function (res) {
       setSyncIndicator(false);
@@ -5968,7 +5988,11 @@ function initApp() {
     })
     .withFailureHandler(function (err) {
       setSyncIndicator(false);
-      Swal.fire('Error', 'Failed to load data: ' + err.message, 'error');
+      // Kalau ada data cache yang sudah ditampilkan di atas, kegagalan network
+      // di sini TIDAK perlu menakut-nakuti user dengan popup error — mereka
+      // masih lihat data (walau mungkin sedikit basi). Cukup diam-diam gagal,
+      // auto-refresh berikutnya akan coba lagi sendiri.
+      if (!cached) Swal.fire('Error', 'Failed to load data: ' + err.message, 'error');
     })
     .getAllDataForYear(STATE.sessionToken, STATE.year);
 
@@ -6436,6 +6460,36 @@ function applyLoadedData(res) {
   _lastDataSnapshot = mSnapshotOf(res);
   mUpdateArchiveBanner();
   updateNotifBadgeAndList();
+  // PERFORMA (stale-while-revalidate): simpan hasil load ini di localStorage
+  // supaya buka app BERIKUTNYA bisa langsung tampilkan data ini SAMBIL
+  // menunggu data segar dari server — lihat pemakaiannya di initApp().
+  // Bukan data sensitif tambahan (sama persis dengan yang sudah ada di
+  // STATE selama sesi ini berjalan), cuma disimpan lebih awal ke disk.
+  if (!STATE.isArchiveView) mSaveDataCache_(res);
+}
+
+function mDataCacheKey_() {
+  return 'monsco_data_cache_v1_' + String(STATE.username || '').toLowerCase() + '_' + STATE.year;
+}
+function mSaveDataCache_(res) {
+  try { localStorage.setItem(mDataCacheKey_(), JSON.stringify(res)); } catch (e) { /* kuota penuh/nonaktif — abaikan, ini cuma optimisasi, bukan sumber data utama */ }
+}
+function mLoadDataCache_(year) {
+  try {
+    var raw = localStorage.getItem('monsco_data_cache_v1_' + String(STATE.username || '').toLowerCase() + '_' + year);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+function mClearDataCacheForCurrentUser_() {
+  try {
+    var prefix = 'monsco_data_cache_v1_' + String(STATE.username || '').toLowerCase() + '_';
+    var toRemove = [];
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (k && k.indexOf(prefix) === 0) toRemove.push(k);
+    }
+    toRemove.forEach(function (k) { localStorage.removeItem(k); });
+  } catch (e) { /* localStorage nonaktif/kuota bermasalah — abaikan, tidak kritikal */ }
 }
 
 function mSnapshotOf(res) {
@@ -6462,12 +6516,13 @@ function mIsBusyEditing() {
 /* Polling diam-diam ke server: kalau ada data baru, otomatis terapkan dan
    render ulang tampilan tanpa perlu reload browser — berlaku di web app
    maupun mobile (m-shell), karena keduanya memakai STATE & render yang sama.
-   CATATAN PERFORMA: sebelum menarik data PENUH (getAllDataForYear, baca
-   ~10 sheet), cek dulu versi data ke server lewat getDataVersion() — itu
-   cuma 1x baca cache, sangat ringan. Data penuh hanya ditarik kalau versi
-   benar2 berubah (artinya ada write baru sejak terakhir kali tarik data).
-   Tahun arsip (read-only) tidak ikut di-polling — datanya tidak pernah
-   berubah, jadi tidak ada gunanya dipoll terus. */
+   CATATAN PERFORMA (diperbarui): dulu ini 2 round-trip terpisah —
+   getDataVersion() dulu untuk cek ada perubahan, BARU getAllDataForYear()
+   kalau memang berubah. Sekarang digabung jadi 1 panggilan:
+   getAllDataForYear(sessionToken, year, lastKnownVersion) — server sendiri
+   yang cek versi dan balas cepat (tanpa baca sheet) kalau memang belum ada
+   perubahan. Tahun arsip (read-only) tidak ikut di-polling — datanya tidak
+   pernah berubah, jadi tidak ada gunanya dipoll terus. */
 function silentRefreshData() {
   if (!STATE.username) return;
   if (_autoRefreshInFlight) return;
@@ -6483,37 +6538,28 @@ function silentRefreshData() {
   refreshAdminMsgs_();
   _autoRefreshInFlight = true;
   google.script.run
-    .withSuccessHandler(function (vres) {
-      if (!vres || !vres.success) { _autoRefreshInFlight = false; return; }
-      if (_lastKnownDataVersion !== null && vres.version === _lastKnownDataVersion) {
-        // Tidak ada perubahan sejak terakhir kali — skip tarik data penuh.
-        _autoRefreshInFlight = false;
+    .withSuccessHandler(function (res) {
+      _autoRefreshInFlight = false;
+      if (!res || !res.success) return;
+      if (res.unchanged) {
+        // Server bilang belum ada perubahan sejak versi terakhir yang kita
+        // tahu — tidak ada apa pun untuk dirender ulang.
+        _lastKnownDataVersion = res.version;
         return;
       }
-      _lastKnownDataVersion = vres.version;
-      google.script.run
-        .withSuccessHandler(function (res) {
-          _autoRefreshInFlight = false;
-          if (!res || !res.success) return;
-          var snap = mSnapshotOf(res);
-          if (snap === _lastDataSnapshot) return; // tidak ada perubahan, jangan render ulang
-          applyLoadedData(res);
-          renderCurrentView();
-          refreshActiveMobileView();
-          setSyncIndicator(false);
-        })
-        .withFailureHandler(function (err) {
-          _autoRefreshInFlight = false;
-          console.error('Auto-refresh failed:', err);
-        })
-        .getAllDataForYear(STATE.sessionToken, STATE.year);
+      _lastKnownDataVersion = res.version;
+      var snap = mSnapshotOf(res);
+      if (snap === _lastDataSnapshot) return; // tidak ada perubahan, jangan render ulang
+      applyLoadedData(res);
+      renderCurrentView();
+      refreshActiveMobileView();
+      setSyncIndicator(false);
     })
-    .withFailureHandler(function () {
-      // Cek versi gagal — fallback aman: tarik data penuh seperti biasa.
-      _lastKnownDataVersion = null;
+    .withFailureHandler(function (err) {
       _autoRefreshInFlight = false;
+      console.error('Auto-refresh failed:', err);
     })
-    .getDataVersion(STATE.sessionToken);
+    .getAllDataForYear(STATE.sessionToken, STATE.year, _lastKnownDataVersion);
 }
 
 function startAutoRefresh() {
