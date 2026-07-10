@@ -301,6 +301,12 @@
     .input-wrap .icon-eye  { position:absolute; right:.85rem; top:50%; transform:translateY(-50%); color:#9ca3af; cursor:pointer; font-size:.85rem; transition:color .15s; z-index:2; }
     .input-wrap .icon-eye:hover { color:var(--brand); }
     .btn-login { width:100%; background:var(--brand); color:white; border:none; padding:.8rem; border-radius:.5rem; font-weight:700; font-size:.95rem; cursor:pointer; transition:.2s; }
+    /* BUG FIX: lihat catatan lengkap di sistem Monsco satu lagi — tombol
+       biometric ini cuma dipakai di layar mobile, tapi display:none-nya dulu
+       HANYA ada di dalam @media(max-width:768px), jadi di desktop dia
+       kelihatan (kotak kecil tanpa styling) bukan tersembunyi. Sekarang
+       display:none dipasang global di sini juga. */
+    .m-login-bio-btn{ display:none; }
     .btn-login:hover { background:#00457e; }
 
     /* ===== APP SHELL ===== */
@@ -4947,6 +4953,26 @@ function hideLoad() { document.getElementById('loading').classList.remove('show'
 // sesi), bukan untuk overlay aksi dalam-app.
 function showBootLoad(msg) { document.getElementById('loading').classList.add('boot-loading'); showLoad(msg); }
 function hideBootLoad() { document.getElementById('loading').classList.remove('boot-loading'); hideLoad(); }
+
+/* PERBAIKAN: sebelumnya tombol Generate AI langsung bisa diklik lagi begitu
+   respons datang, TERMASUK saat responsnya "kena limit request-per-menit
+   Gemini" (res.quotaExceeded) — user wajar langsung klik lagi karena
+   tombolnya sudah aktif, padahal limit-nya BELUM reset, jadi kena error yang
+   SAMA lagi. Ini sumber laporan "AI sering error". Sekarang: kalau errornya
+   quota, tombol dikunci ~60 detik dengan hitung mundur. */
+function mAiBtnCooldown_(btn, quotaExceeded) {
+  if (!btn) return;
+  var origHtml = btn.dataset.origHtml;
+  if (!quotaExceeded) { btn.disabled = false; btn.innerHTML = origHtml; return; }
+  var seconds = 60;
+  btn.disabled = true;
+  (function tick() {
+    if (seconds <= 0) { btn.disabled = false; btn.innerHTML = origHtml; return; }
+    btn.innerHTML = '<i class="fas fa-clock"></i> ' + seconds + 's';
+    seconds--;
+    setTimeout(tick, 1000);
+  })();
+}
 function rawNumber(el) { return Number(String(el.value).replace(/[^0-9]/g, '')) || 0; }
 function bindRupiahInputEvent(el) {
   var digits = el.value.replace(/[^0-9]/g, '');
@@ -11409,7 +11435,7 @@ function mStartReceiptScan_(base64, mimeType, previewUrl) {
     .withSuccessHandler(function (res) {
       mFinishReceiptScan_();
       if (!res || !res.success) {
-        mShowReceiptError_((res && res.message) || 'Could not read the receipt. Please try again or fill in manually.', previewUrl);
+        mShowReceiptError_((res && res.message) || 'Could not read the receipt. Please try again or fill in manually.', previewUrl, res && res.quotaExceeded);
         return;
       }
       mApplyReceiptResult_(res.result, previewUrl);
@@ -11430,13 +11456,24 @@ function mFinishReceiptScan_() {
 /* Shows the error inline with a Retry button that reuses the same photo —
    no need to take/upload it again for a transient failure (e.g. the AI
    service being temporarily overloaded). */
-function mShowReceiptError_(message, previewUrl) {
+function mShowReceiptError_(message, previewUrl, quotaExceeded) {
   var statusEl = document.getElementById('m-scan-receipt-status');
   if (statusEl) {
     statusEl.classList.remove('d-none', 'success');
     statusEl.innerHTML = '<img src="' + previewUrl + '" alt="">' +
       '<span>' + escapeHtml(message) + '</span>' +
-      '<button type="button" class="m-scan-retry-btn" onclick="mRetryReceiptScan_()"><i class="fas fa-rotate-right"></i>Retry</button>';
+      '<button type="button" class="m-scan-retry-btn" id="m-scan-retry-btn" onclick="mRetryReceiptScan_()"' + (quotaExceeded ? ' disabled' : '') + '><i class="fas fa-rotate-right"></i>Retry</button>';
+    if (quotaExceeded) {
+      var retryBtn = document.getElementById('m-scan-retry-btn');
+      var seconds = 60;
+      (function tick() {
+        if (!retryBtn || !document.body.contains(retryBtn)) return;
+        if (seconds <= 0) { retryBtn.disabled = false; retryBtn.innerHTML = '<i class="fas fa-rotate-right"></i>Retry'; return; }
+        retryBtn.innerHTML = '<i class="fas fa-clock"></i>Retry (' + seconds + 's)';
+        seconds--;
+        setTimeout(tick, 1000);
+      })();
+    }
   }
   mToast(message, 'warn');
 }
@@ -12182,7 +12219,7 @@ function generateAIInsightClick(targetElId, btnId) {
   if (btn) { btn.disabled = true; btn.dataset.origHtml = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; }
   google.script.run
     .withSuccessHandler(function (res) {
-      if (btn) { btn.disabled = false; btn.innerHTML = btn.dataset.origHtml; }
+      mAiBtnCooldown_(btn, res && res.quotaExceeded);
       if (!res.success) {
         if (res.needsSetup) {
           Swal.fire({
