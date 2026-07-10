@@ -22,24 +22,22 @@
        icon-192.png) WAJIB ada di root repo monsco-id, sejajar dengan
        Index.html, atau ikon tidak akan muncul.
 
-       UPDATE: awalnya SENGAJA tidak pakai apple-mobile-web-app-capable
-       supaya ikon homescreen buka sebagai tab Safari biasa (ada address
-       bar). Diminta diubah lagi — sekarang tag ini DIPASANG supaya ikon
-       homescreen buka fullscreen tanpa address bar (mode standalone iOS).
-       TIDAK perlu manifest.json untuk ini di iOS — mekanisme "Add to Home
-       Screen" iOS yang lama (non-manifest) cukup pakai meta tag apple-*
-       di bawah ini saja. (Kalau nanti mau Android Chrome juga menawarkan
-       "Install app" standalone, itu baru butuh manifest.json terpisah —
-       belum ditambahkan di sini karena belum diminta.) -->
+       SENGAJA TIDAK memakai manifest.json atau apple-mobile-web-app-capable
+       — tanpa manifest, browser tidak akan menawarkan "Add to Home Screen"
+       sebagai app terinstal (mode PWA/standalone). Cukup favicon tab biasa
+       + ikon bookmark/shortcut kalau user simpan manual ke homescreen.
+
+       CATATAN: sempat dicoba diaktifkan (apple-mobile-web-app-capable) untuk
+       uji coba mode standalone, tapi muncul bug WebKit — gap putih di bawah
+       bottom nav (posisi dihitung benar tapi tidak ter-paint sampai tepi
+       layar di sebagian device). Dikembalikan lagi ke mode tab Safari biasa
+       (sama seperti Monsco versi pribadi) sampai ada solusi yang lebih pasti. -->
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
   <link rel="shortcut icon" type="image/png" href="favicon-32x32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <meta name="theme-color" content="#005CAA">
-  <meta name="apple-mobile-web-app-title" content="Monsco">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
   <!-- PERF: preconnect/dns-prefetch ke semua host eksternal yang dipakai
        (CDN CSS/JS + backend RPC). script.google.com PALING penting di sini
