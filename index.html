@@ -12172,8 +12172,12 @@ function computeInsights() {
    (m-an-insights-wrap) karena isinya sama (1 bulan yang sama). */
 var LAST_AI_INSIGHT_LINES = null; // null = belum pernah generate AI di sesi ini
 
-function buildKeyTakeaway_(insights) {
+function buildKeyTakeaway_(insights, isAi) {
   if (!insights.length) return 'No notable changes detected this month.';
+  // BUG FIX: lihat catatan lengkap di sistem Monsco satu lagi — insight AI
+  // sekarang menaruh kesimpulan paling penting di baris TERAKHIR (bukan
+  // baris pertama, yang sebelumnya kebetulan berisi sapaan pembuka).
+  if (isAi) return insights[insights.length - 1].text;
   var warn = insights.filter(function (i) { return i.type === 'warn'; });
   var pick = warn.length ? warn[0] : insights[0];
   return pick.text;
@@ -12201,7 +12205,7 @@ function renderInsights(targetElId) {
     return '<div class="ai-summary-item ' + ins.type + '"><div class="ai-summary-num">' + num + '</div><div class="ai-summary-text">' + escapeHtml(ins.text) + '</div></div>';
   }).join('');
 
-  var takeaway = buildKeyTakeaway_(insights);
+  var takeaway = buildKeyTakeaway_(insights, isAi);
 
   wrap.innerHTML =
     '<div class="ai-summary-subtitle">' + escapeHtml(title) + '</div>' +
