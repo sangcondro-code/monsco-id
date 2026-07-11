@@ -177,6 +177,11 @@
     #terms-page-section { position:fixed; inset:0; background:#ffffff; z-index:9999; display:flex; flex-direction:column; }
     #terms-page-section.d-none { display:none !important; }
 
+    /* ---- Help & Guide (pola sama seperti plan-landing/register/terms —
+       overlay position:fixed penuh layar, bisa ditumpuk di atas apa saja) ---- */
+    #help-guide-section { position:fixed; inset:0; background:#ffffff; z-index:9999; display:flex; flex-direction:column; }
+    #help-guide-section.d-none { display:none !important; }
+
     .reg-info-section { max-width:900px; margin:0 auto; padding:3rem 1.5rem 1rem; text-align:center; }
     .reg-info-badge { display:inline-flex; align-items:center; gap:8px; background:var(--brand-light); color:var(--brand); padding:6px 14px; border-radius:999px; font-size:.76rem; font-weight:700; letter-spacing:.2px; margin-bottom:18px; }
     .reg-info-title { font-size:1.9rem; font-weight:700; line-height:1.25; color:#1E293B; margin-bottom:12px; }
@@ -229,6 +234,9 @@
       font-weight:700; font-size:.95rem; cursor:pointer; transition:.15s;
     }
     .pl-demo-btn:hover { background:var(--brand-light); }
+    .pl-help-link{ display:block; margin:.9rem auto 0; background:none; border:none; cursor:pointer;
+      font-size:.83rem; font-weight:600; color:#64748b; }
+    .pl-help-link:hover{ color:var(--brand); }
     .pl-section { max-width:1080px; margin:0 auto; padding:2.5rem 1.5rem; }
     .pl-section-tint { max-width:none; background:var(--brand-light); }
     .pl-section-tint > * { max-width:1080px; margin-left:auto; margin-right:auto; }
@@ -255,6 +263,35 @@
     .pl-trust { max-width:640px; margin:0 auto; padding:2rem 1.5rem 2.5rem; border-top:1px solid #eef1f5; text-align:center; color:#64748b; font-size:.83rem; line-height:1.5; }
     .pl-trust i { color:var(--brand); margin-right:.3rem; }
     .pl-footer { text-align:center; color:#94A3B8; font-size:.72rem; letter-spacing:.3px; padding:1.5rem; border-top:1px solid #eef1f5; }
+
+    /* ---- Help & Guide: nav pills, daftar poin, badge "BARU", FAQ accordion ---- */
+    .hg-nav-wrap{ position:sticky; top:0; background:#fff; z-index:5; border-bottom:1px solid #eef1f5; padding:.65rem 0; }
+    .hg-nav{ max-width:1080px; margin:0 auto; padding:0 1.5rem; display:flex; gap:.5rem; overflow-x:auto; -ms-overflow-style:none; scrollbar-width:none; }
+    .hg-nav::-webkit-scrollbar{ display:none; }
+    .hg-nav-pill{ flex:0 0 auto; padding:.4rem 1rem; border-radius:999px; background:#f1f5f9; color:#475569;
+      font-size:.78rem; font-weight:600; text-decoration:none; white-space:nowrap; transition:.15s; }
+    .hg-nav-pill:hover{ background:var(--brand); color:#fff; }
+    .hg-new-badge{ display:inline-block; background:#16A34A; color:#fff; font-size:.62rem; font-weight:700;
+      padding:2px 8px; border-radius:999px; letter-spacing:.3px; vertical-align:middle; margin-left:6px; }
+    .hg-step-list{ max-width:760px; margin:0 auto; padding-left:1.3rem; counter-reset:hg-step; }
+    .hg-step-list li{ margin-bottom:1.1rem; line-height:1.65; color:#475569; font-size:.92rem; padding-left:.3rem; }
+    .hg-step-list li b{ color:#1E293B; }
+    .hg-point-list{ max-width:760px; margin:0 auto; padding-left:1.2rem; }
+    .hg-point-list li{ margin-bottom:.9rem; line-height:1.65; color:#475569; font-size:.92rem; }
+    .hg-point-list li b{ color:#1E293B; }
+    .hg-faq-list{ max-width:760px; margin:0 auto; }
+    .hg-faq-item{ background:#fff; border:1px solid #eef1f5; border-radius:.75rem; padding:1rem 1.25rem; margin-bottom:.7rem; }
+    .hg-faq-item summary{ cursor:pointer; font-weight:700; color:#1E293B; font-size:.92rem; list-style:none;
+      display:flex; justify-content:space-between; align-items:center; gap:1rem; }
+    .hg-faq-item summary::-webkit-details-marker{ display:none; }
+    .hg-faq-item summary::after{ content:'+'; font-size:1.3rem; color:var(--brand); flex-shrink:0; }
+    .hg-faq-item[open] summary::after{ content:'\2212'; }
+    .hg-faq-item p{ margin:.7rem 0 0; color:#64748b; font-size:.86rem; line-height:1.65; }
+    .hg-faq-item a{ color:var(--brand); font-weight:700; }
+    @media(max-width:640px){
+      .pl-hero h1{ font-size:1.5rem !important; }
+      .hg-nav-pill{ font-size:.74rem; padding:.35rem .8rem; }
+    }
 
     /* ---- Admin: Kelola Paket (subscription plan cards) ---- */
     .aplan-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:1rem; }
@@ -1777,6 +1814,7 @@
       <h1>Kelola Keuangan Pribadi,<br>Lebih Rapi &amp; Lebih Aman</h1>
       <p>Satu aplikasi untuk mencatat transaksi, mengatur anggaran, memantau utang &amp; aset, sampai mendapat ringkasan finansial otomatis dari AI — dengan data yang tetap privat.</p>
       <button type="button" class="pl-demo-btn" onclick="startDemoMode()"><i class="fas fa-play me-2"></i>Coba Demo — Tanpa Daftar</button>
+      <button type="button" class="pl-help-link" onclick="openHelpGuide()"><i class="fas fa-circle-question me-1"></i>Butuh panduan dulu? Lihat Bantuan &amp; Panduan</button>
     </div>
 
     <!-- FEATURES -->
@@ -2159,6 +2197,227 @@
 
 
 <!-- ============================================================ -->
+<!-- HELP & GUIDE — halaman bantuan/panduan penuh, pola SAMA seperti -->
+<!-- #plan-landing-section/#register-page-section/#terms-page-section -->
+<!-- (position:fixed overlay penuh layar) — supaya bisa dibuka dari   -->
+<!-- MANA SAJA (halaman Register sebelum login, sidebar web app,      -->
+<!-- maupun menu Profile mobile) tanpa perlu tahu/mengubah apa yang   -->
+<!-- sedang tampil di baliknya: overlay ini menutupinya sepenuhnya,   -->
+<!-- dan closeHelpGuide() cukup menyembunyikannya lagi — apa pun yang  -->
+<!-- ada di belakang otomatis kelihatan lagi persis seperti semula.   -->
+<!-- ============================================================ -->
+<div id="help-guide-section" class="d-none">
+  <div class="pl-topbar">
+    <div class="pl-topbar-inner">
+      <div class="pl-brand"><i class="fas fa-wallet"></i> Monsco</div>
+      <button type="button" class="pl-login-link" onclick="closeHelpGuide()"><span>&larr; Kembali</span></button>
+    </div>
+  </div>
+
+  <div class="pl-scroll" id="help-guide-scroll">
+    <div class="pl-hero" style="padding:2.75rem 1.5rem 1.5rem;">
+      <h1 style="font-size:1.85rem;">Bantuan &amp; Panduan</h1>
+      <p>Semua yang perlu Anda tahu untuk mengelola keuangan lewat Monsco — dari langkah pertama, sampai fitur paling detail. Santai saja, tidak ada yang rumit kok. 🙂</p>
+    </div>
+
+    <div class="hg-nav-wrap">
+      <div class="hg-nav">
+        <a href="#hg-mulai" class="hg-nav-pill">👋 Mulai dari Sini</a>
+        <a href="#hg-dashboard" class="hg-nav-pill">📊 Dashboard</a>
+        <a href="#hg-catat" class="hg-nav-pill">✏️ Catat Transaksi</a>
+        <a href="#hg-transfer" class="hg-nav-pill">🔁 Transfer Akun</a>
+        <a href="#hg-budgeting" class="hg-nav-pill">💰 Budgeting</a>
+        <a href="#hg-transaksi" class="hg-nav-pill">📜 Riwayat</a>
+        <a href="#hg-recurring" class="hg-nav-pill">🔄 Recurring</a>
+        <a href="#hg-reminder" class="hg-nav-pill">🔔 Reminder</a>
+        <a href="#hg-debt" class="hg-nav-pill">🤝 Utang &amp; Piutang</a>
+        <a href="#hg-wealth" class="hg-nav-pill">💎 Wealth</a>
+        <a href="#hg-setup" class="hg-nav-pill">⚙️ Setup &amp; Keamanan</a>
+        <a href="#hg-faq" class="hg-nav-pill">❓ FAQ</a>
+      </div>
+    </div>
+
+    <!-- ================= MULAI DARI SINI ================= -->
+    <div class="pl-section" id="hg-mulai">
+      <div class="pl-section-title">👋 Mulai dari Sini</div>
+      <p class="pl-section-sub">4 langkah singkat ini bikin Monsco langsung kerasa manfaatnya sejak hari pertama.</p>
+      <ol class="hg-step-list">
+        <li>
+          <b>Siapkan kategori Anda dulu.</b> Buka <b>Setup</b>, lalu isi daftar Akun (rekening bank/e-wallet/Cash), sumber
+          Income, kategori Needs &amp; Wants, dan kategori Tabungan sesuai kebiasaan Anda. Tenang, ini bukan harga mati —
+          bisa ditambah, diubah, atau dihapus kapan saja nanti.
+        </li>
+        <li>
+          <b>Catat transaksi pertama Anda.</b> Buka <b>Add Spending</b>, isi tanggal, akun, kategori, dan jumlahnya.
+          Butuh beberapa detik saja — dan begitu ada transaksi pertama, Dashboard langsung mulai menampilkan grafik &amp;
+          angka yang sesungguhnya, bukan lagi contoh kosong.
+        </li>
+        <li>
+          <b>Atur rencana Budget bulanan (opsional, tapi sangat disarankan).</b> Di halaman <b>Budgeting</b>, tentukan
+          batas pengeluaran tiap kategori Needs/Wants. Ini yang bikin Monsco terasa seperti asisten keuangan pribadi,
+          bukan cuma buku catatan biasa.
+        </li>
+        <li>
+          <b>Jadikan kebiasaan.</b> Semakin rutin dicatat, semakin akurat gambaran keuangan Anda — dan semakin tajam juga
+          Ringkasan AI di Dashboard dalam membaca pola belanja Anda.
+        </li>
+      </ol>
+    </div>
+
+    <!-- ================= DASHBOARD ================= -->
+    <div class="pl-section pl-section-tint" id="hg-dashboard">
+      <div class="pl-section-title">📊 Dashboard: Gambaran Besar Keuangan Anda</div>
+      <p class="pl-section-sub">Halaman pertama yang Anda lihat setiap buka Monsco — ringkasan sekali lihat, langsung paham.</p>
+      <ul class="hg-point-list">
+        <li><b>Net Balance:</b> Angka besar di kartu biru paling atas — perkiraan uang yang benar-benar bisa Anda pakai sekarang (Income dikurangi Needs, Wants, dan Savings bulan berjalan).</li>
+        <li><b>Kartu Ringkasan:</b> Total Income, Budgeted Expenses, Total Spending, dan Monthly Savings — lengkap dengan perbandingan naik/turun dibanding bulan lalu.</li>
+        <li><b>Ringkasan AI:</b> Tekan ikon tongkat ajaib di kartu "AI Summary" untuk mendapat ringkasan bahasa manusia tentang kondisi keuangan bulan ini — bukan cuma angka mentah.</li>
+        <li><b>Expenses List:</b> Perbandingan alokasi (rencana) vs realisasi tiap kategori, lengkap dengan progress bar — hijau berarti aman, kuning mulai mendekati batas, merah berarti sudah lewat.</li>
+        <li><b>Grafik Income vs Expense:</b> Tren bulan-ke-bulan, biar Anda tahu apakah polanya membaik atau perlu dievaluasi.</li>
+        <li><b>Accounts (saldo per akun):</b> Rekap saldo semua rekening/e-wallet dalam satu tempat — tidak perlu buka-tutup banyak aplikasi bank lagi.</li>
+      </ul>
+    </div>
+
+    <!-- ================= CATAT TRANSAKSI ================= -->
+    <div class="pl-section" id="hg-catat">
+      <div class="pl-section-title">✏️ Catat Transaksi (Add Spending)</div>
+      <p class="pl-section-sub">Ini jantungnya Monsco — semakin rajin dicatat, semakin akurat semuanya.</p>
+      <ul class="hg-point-list">
+        <li><b>Catat sekecil apa pun itu.</b> Ngopi, parkir, sampai tagihan besar — semua layak dicatat. Isi tanggal, akun, kategori (Needs/Wants), jumlah, dan catatan singkat kalau perlu.</li>
+        <li><b>Split ke beberapa kategori.</b> Belanja bulanan yang sekaligus mencakup makanan &amp; kebutuhan rumah tangga? Aktifkan "Split into multiple categories" supaya 1 struk bisa dipecah ke beberapa kategori sekaligus, tetap dalam 1 kali input.</li>
+        <li><b>Scan Struk pakai AI.</b> Malas mengetik manual? Foto struk belanja Anda — AI akan otomatis membaca total, tanggal, dan menyarankan kategorinya. Tinggal cek &amp; simpan.</li>
+        <li><b>Tandai dengan Tag.</b> Ingin mengelompokkan pengeluaran lintas kategori (mis. semua yang berhubungan dengan "Liburan Bali")? Pakai kolom Tag — nanti bisa difilter jadi satu di halaman Transactions.</li>
+      </ul>
+    </div>
+
+    <!-- ================= TRANSFER ANTAR AKUN ================= -->
+    <div class="pl-section pl-section-tint" id="hg-transfer">
+      <div class="pl-section-title">🔁 Transfer Antar Akun <span class="hg-new-badge">BARU</span></div>
+      <p class="pl-section-sub">Fitur terbaru — akhirnya, tarik tunai &amp; pindah saldo tidak perlu lagi bikin Budget berantakan.</p>
+      <ul class="hg-point-list">
+        <li><b>Kapan dipakai?</b> Setiap kali uang cuma <i>pindah tempat</i> — bukan pengeluaran maupun pemasukan sungguhan. Contoh: tarik tunai dari ATM (Bank → Cash), atau pindah saldo antar rekening (BRI → CIMB Niaga).</li>
+        <li><b>Cara pakainya.</b> Buka <b>Transfer Account</b> di sidebar (atau tombol "Transfer / Withdraw Cash" di halaman Accounts pada versi mobile), pilih akun asal &amp; tujuan, isi jumlahnya, selesai.</li>
+        <li><b>Tidak mengganggu Budget sama sekali.</b> Transfer sengaja dipisahkan dari Income/Needs/Wants/Savings — jadi laporan pengeluaran &amp; pemasukan Anda tetap akurat, tidak ikut "tercemar" oleh perpindahan uang yang sebetulnya bukan belanja.</li>
+        <li><b>Tetap tercatat rapi.</b> Tetap muncul di riwayat Transaksi (dengan label jelas "Transfer Out"/"Transfer In" beserta arah akunnya), jadi jejak uang Anda tetap lengkap kalau suatu saat perlu ditelusuri.</li>
+      </ul>
+    </div>
+
+    <!-- ================= BUDGETING ================= -->
+    <div class="pl-section" id="hg-budgeting">
+      <div class="pl-section-title">💰 Budgeting: Rencana Belanja Anda</div>
+      <p class="pl-section-sub">Budget itu bukan soal mengekang diri — ini soal berbelanja dengan sadar &amp; terarah.</p>
+      <ul class="hg-point-list">
+        <li><b>Tentukan batasnya.</b> Di halaman Budgeting, tentukan jumlah rencana untuk tiap kategori Needs &amp; Wants bulan ini.</li>
+        <li><b>Pantau realisasinya otomatis.</b> Setiap kali Anda catat transaksi lewat Add Spending, angkanya otomatis mengurangi sisa budget kategori terkait — langsung terlihat di Dashboard maupun halaman Budgeting.</li>
+        <li><b>Fleksibel, bukan kaku.</b> Rencana kepepet berubah di tengah bulan? Boleh saja diubah kapan pun — hidup memang tidak selalu sesuai rencana.</li>
+        <li><b>Needs vs Wants.</b> Pemisahan ini membantu Anda melihat pola: berapa banyak sebenarnya yang habis untuk kebutuhan pokok, dan berapa untuk keinginan/hiburan.</li>
+        <li><b>Add Income &amp; Add Saving.</b> Di halaman yang sama, Anda juga bisa mencatat pemasukan dan setoran tabungan bulan ini.</li>
+      </ul>
+    </div>
+
+    <!-- ================= RIWAYAT TRANSAKSI ================= -->
+    <div class="pl-section pl-section-tint" id="hg-transaksi">
+      <div class="pl-section-title">📜 Transactions: Riwayat Lengkap</div>
+      <p class="pl-section-sub">Buku besar keuangan Anda — semua tercatat, semua bisa dicari.</p>
+      <ul class="hg-point-list">
+        <li><b>Semua dalam satu tempat.</b> Setiap Income, pengeluaran, tabungan, dan transfer yang pernah dicatat, tersusun rapi secara kronologis.</li>
+        <li><b>Cari dengan cepat.</b> Gunakan filter Bulan, Jenis (Income/Needs/Wants/Savings/Transfer), Akun, atau Tag untuk menemukan transaksi tertentu dalam sekejap.</li>
+        <li><b>Gampang dikoreksi.</b> Salah ketik jumlah atau kategori? Tinggal tekan ikon pensil untuk edit, atau ikon tempat sampah untuk hapus.</li>
+      </ul>
+    </div>
+
+    <!-- ================= RECURRING ================= -->
+    <div class="pl-section" id="hg-recurring">
+      <div class="pl-section-title">🔄 Recurring: Tagihan yang Mengulang Sendiri</div>
+      <p class="pl-section-sub">Buat sekali, biar sistem yang ingatkan &amp; catat setiap bulan.</p>
+      <ul class="hg-point-list">
+        <li><b>Cocok untuk tagihan rutin.</b> Sewa kos, cicilan, langganan streaming, listrik — apa pun yang jumlah &amp; jadwalnya cenderung tetap.</li>
+        <li><b>Otomatis tercatat.</b> Begitu tanggalnya tiba, transaksinya otomatis muncul di riwayat Anda — tidak perlu diketik ulang setiap bulan.</li>
+        <li><b>Tetap dalam kendali Anda.</b> Bisa dijeda (skip) untuk bulan tertentu, diedit, atau dinonaktifkan kapan saja.</li>
+      </ul>
+    </div>
+
+    <!-- ================= REMINDER ================= -->
+    <div class="pl-section pl-section-tint" id="hg-reminder">
+      <div class="pl-section-title">🔔 My Reminders: Jangan Sampai Kelupaan</div>
+      <p class="pl-section-sub">Pengingat custom biar tidak ada tagihan yang kelewat.</p>
+      <ul class="hg-point-list">
+        <li><b>Buat pengingat sesuai kebutuhan Anda.</b> Bebas mau untuk apa saja — bayar tagihan, deadline cicilan, atau sekadar pengingat "waktunya review budget bulan ini".</li>
+        <li><b>Notifikasi lewat email.</b> Aktifkan pengingat digest harian/mingguan supaya tidak perlu buka aplikasi terus-menerus untuk tahu ada yang jatuh tempo.</li>
+      </ul>
+    </div>
+
+    <!-- ================= DEBT & LOAN ================= -->
+    <div class="pl-section" id="hg-debt">
+      <div class="pl-section-title">🤝 Debt &amp; Loan: Utang &amp; Piutang</div>
+      <p class="pl-section-sub">Baik uang yang Anda pinjam, maupun yang Anda pinjamkan ke orang lain.</p>
+      <ul class="hg-point-list">
+        <li><b>Catat semua jenisnya.</b> Kartu kredit, KPR, cicilan, sampai piutang ke teman/saudara — semua bisa dipantau sisa saldonya di satu tempat.</li>
+        <li><b>Pembayaran otomatis mengurangi saldo.</b> Setiap kali Anda mencatat pembayaran/cicilan lewat fitur ini, sisa utang otomatis terupdate — dan transaksinya ikut tercatat sebagai pengeluaran biasa.</li>
+        <li><b>Debt Payoff Planner.</b> Simulasikan berapa lama utang akan lunas berdasarkan skenario pembayaran yang Anda rencanakan.</li>
+      </ul>
+    </div>
+
+    <!-- ================= WEALTH MANAGEMENT ================= -->
+    <div class="pl-section pl-section-tint" id="hg-wealth">
+      <div class="pl-section-title">💎 Wealth Management: Kekayaan Jangka Panjang</div>
+      <p class="pl-section-sub">Kalau Add Spending &amp; Budgeting itu soal harian, Wealth Management ini soal gambaran besar.</p>
+      <ul class="hg-point-list">
+        <li><b>Pocket (Tabungan Bertarget):</b> Buat "kantong" tabungan terpisah untuk tujuan tertentu (Dana Darurat, DP Rumah, Liburan) — lengkap dengan target nominal &amp; tenggat waktu kalau mau. Nabung &amp; tarik dari sini tidak memengaruhi Budget bulanan.</li>
+        <li><b>Asset (Aset Non-Likuid):</b> Catat properti, kendaraan, emas, deposito, atau barang berharga lain sebagai bagian dari kekayaan Anda.</li>
+        <li><b>Stock Tracking:</b> Pantau portofolio saham (termasuk bursa AS) — harga terkini diambil otomatis, untung/rugi dihitung sendiri, konversi ke Rupiah pun otomatis kalau sahamnya dalam Dolar.</li>
+        <li><b>Grafik Net Worth:</b> Lihat tren total kekayaan Anda (tabungan + aset + saham, dikurangi utang) dari waktu ke waktu — salah satu grafik paling memuaskan untuk dilihat naik terus. 📈</li>
+      </ul>
+    </div>
+
+    <!-- ================= SETUP & KEAMANAN ================= -->
+    <div class="pl-section" id="hg-setup">
+      <div class="pl-section-title">⚙️ Setup &amp; Keamanan</div>
+      <p class="pl-section-sub">Semua pengaturan dasar Monsco, dari kategori sampai proteksi akun.</p>
+      <ul class="hg-point-list">
+        <li><b>Kelola Kategori:</b> Tambah/ubah/hapus daftar Akun, sumber Income, kategori Needs/Wants/Savings, dan Tag — kapan pun kebutuhan Anda berubah.</li>
+        <li><b>Profil &amp; Keamanan:</b> Ubah nama, email, atau kata sandi. Aktifkan login Sidik Jari/Face ID di perangkat mobile Anda untuk masuk lebih cepat &amp; tetap aman.</li>
+        <li><b>Archive Tahun:</b> Data tahun-tahun lama bisa diarsipkan supaya tampilan tetap ringan &amp; rapi, tanpa kehilangan datanya sama sekali — tinggal buka arsip kapan pun perlu.</li>
+      </ul>
+    </div>
+
+    <!-- ================= FAQ ================= -->
+    <div class="pl-section pl-section-tint" id="hg-faq">
+      <div class="pl-section-title">❓ Pertanyaan yang Sering Ditanyakan</div>
+      <div class="hg-faq-list">
+        <details class="hg-faq-item">
+          <summary>Apakah data keuangan saya aman &amp; privat?</summary>
+          <p>Ya. Setiap pengguna Monsco punya spreadsheet data sendiri yang terpisah total dari pengguna lain — bukan sekadar akun login yang berbeda di dalam satu database bersama. Kata sandi dienkripsi, dan sesi login otomatis kedaluwarsa demi keamanan tambahan.</p>
+        </details>
+        <details class="hg-faq-item">
+          <summary>Saya terbiasa pakai spreadsheet manual. Apa untungnya pindah ke Monsco?</summary>
+          <p>Semua kemudahan spreadsheet, tanpa drama rumus rusak, sel kepencet salah, atau kebingungan versi file mana yang terbaru. Semuanya otomatis, visual, dan tetap bisa diakses dari HP mana pun — lengkap dengan grafik &amp; ringkasan AI yang tidak mungkin Anda buat manual tiap hari.</p>
+        </details>
+        <details class="hg-faq-item">
+          <summary>Bagaimana cara kerja fitur Transfer, apa bedanya dengan pengeluaran biasa?</summary>
+          <p>Transfer khusus untuk uang yang <i>pindah tempat</i> di antara akun Anda sendiri (misal tarik tunai, atau pindah saldo antar bank) — bukan uang yang benar-benar keluar untuk membayar sesuatu. Karena itu, Transfer sengaja tidak dihitung sebagai pengeluaran maupun pemasukan di Budget/Dashboard, tapi tetap memperbarui saldo akun yang bersangkutan dengan benar. Lihat bagian <a href="#hg-transfer" onclick="event.stopPropagation();">Transfer Antar Akun</a> di atas untuk detailnya.</p>
+        </details>
+        <details class="hg-faq-item">
+          <summary>Saya lupa kata sandi. Bagaimana cara reset-nya?</summary>
+          <p>Di halaman Login, tekan "Lupa Password", masukkan email terdaftar Anda, lalu ikuti kode OTP yang dikirim ke email tersebut untuk membuat kata sandi baru.</p>
+        </details>
+        <details class="hg-faq-item">
+          <summary>Bisa dipakai di HP tanpa install aplikasi?</summary>
+          <p>Bisa. Monsco berjalan langsung dari browser HP Anda — tinggal buka link-nya, dan kalau mau, tambahkan ke Home Screen supaya terasa seperti aplikasi biasa.</p>
+        </details>
+        <details class="hg-faq-item">
+          <summary>Saya masih bingung atau ingin memberi masukan. Harus hubungi siapa?</summary>
+          <p>Silakan email ke <a href="mailto:monsco.money@gmail.com">monsco.money@gmail.com</a> — kami senang menerima pertanyaan maupun masukan untuk membuat Monsco makin baik.</p>
+        </details>
+      </div>
+    </div>
+
+    <div class="pl-footer">MONSCO &middot; Money Management</div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
 <!-- APP                                                            -->
 <!-- ============================================================ -->
 <div id="demo-mode-banner" class="d-none">
@@ -2226,6 +2485,7 @@
     <div class="nav-item" id="nav-asset" onclick="go('asset')"><i class="fas fa-landmark"></i> Wealth Management</div>
 
     <div class="nav-label">Settings</div>
+    <div class="nav-item" id="nav-help" onclick="openHelpGuide()"><i class="fas fa-circle-question"></i> Help &amp; Guide</div>
     <div class="nav-item" id="nav-setup" onclick="go('setup')"><i class="fas fa-cog"></i> Setup</div>
     <div class="nav-item d-none" id="nav-admin" onclick="go('admin')"><i class="fas fa-user-shield"></i> Admin
       <span class="d-none" id="admin-notif-badge" style="background:#dc2626;color:#fff;font-size:.65rem;font-weight:700;padding:1px 6px;border-radius:999px;margin-left:6px;">0</span>
@@ -4590,6 +4850,14 @@
         </button>
       </div>
 
+      <div class="m-profile-menu">
+        <button type="button" class="m-profile-item" onclick="openHelpGuide()">
+          <div class="m-profile-item-icon"><i class="fas fa-circle-question"></i></div>
+          <div class="m-profile-item-label">Help &amp; Guide</div>
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+
       <div class="m-profile-section-label">Settings</div>
       <div class="m-profile-menu">
         <button type="button" class="m-profile-item" onclick="mOpenRecurringSheet()">
@@ -5351,6 +5619,26 @@ function closePlanLanding() {
   document.getElementById('register-page-section').classList.add('d-none');
   document.getElementById('terms-page-section').classList.add('d-none');
   document.getElementById('forgot-password-wrap').classList.add('d-none');
+}
+
+/* ==================================================================
+ *  HELP & GUIDE — overlay position:fixed (pola sama seperti Plan
+ *  Landing/Register/Terms di atas), bisa dibuka dari MANA SAJA: tombol
+ *  di halaman landing (sebelum login), menu sidebar web app (di atas
+ *  Setup), maupun menu Profile mobile (di bawah Admin Panel). Karena
+ *  ini overlay penuh layar yang cuma DITUMPUK di atas apa pun yang
+ *  sedang tampil (bukan pindah "view" seperti go()/mGo()), closeHelpGuide()
+ *  CUKUP menyembunyikannya lagi — tidak perlu tahu/mengingat konteks
+ *  dari mana ia dibuka, apa yang ada di baliknya otomatis kelihatan lagi
+ *  persis seperti semula.
+ * ================================================================== */
+function openHelpGuide() {
+  document.getElementById('help-guide-section').classList.remove('d-none');
+  var scrollEl = document.getElementById('help-guide-scroll');
+  if (scrollEl) scrollEl.scrollTop = 0;
+}
+function closeHelpGuide() {
+  document.getElementById('help-guide-section').classList.add('d-none');
 }
 
 function choosePlan(key, label) {
