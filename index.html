@@ -1620,7 +1620,11 @@
       html.has-session #loading{ display:flex !important; background:#fff !important; color:#005CAA !important; }
       html.has-session #loading .spinner-border{ display:none !important; }
       html.has-session #loading #loading-msg{ display:none !important; }
-      html.has-session #loading .boot-logo{ display:block !important; animation:mBootPulse 1.4s ease-in-out infinite; }
+      html.has-session #loading .boot-logo{
+        display:block !important; width:60px !important; height:60px !important;
+        border-radius:16px !important; object-fit:cover !important;
+        animation:mBootPulse 1.4s ease-in-out infinite;
+      }
   </style>
   <script>
     (function () {
