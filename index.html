@@ -264,15 +264,13 @@
     .pl-trust i { color:var(--brand); margin-right:.3rem; }
     .pl-footer { text-align:center; color:#94A3B8; font-size:.72rem; letter-spacing:.3px; padding:1.5rem; border-top:1px solid #eef1f5; }
 
-    /* ---- Help & Guide: nav pills, daftar poin, badge "BARU", FAQ accordion ---- */
+    /* ---- Help & Guide: nav pills, daftar poin, FAQ accordion ---- */
     .hg-nav-wrap{ position:sticky; top:0; background:#fff; z-index:5; border-bottom:1px solid #eef1f5; padding:.65rem 0; }
     .hg-nav{ max-width:1080px; margin:0 auto; padding:0 1.5rem; display:flex; gap:.5rem; overflow-x:auto; -ms-overflow-style:none; scrollbar-width:none; }
     .hg-nav::-webkit-scrollbar{ display:none; }
     .hg-nav-pill{ flex:0 0 auto; padding:.4rem 1rem; border-radius:999px; background:#f1f5f9; color:#475569;
       font-size:.78rem; font-weight:600; text-decoration:none; white-space:nowrap; transition:.15s; }
     .hg-nav-pill:hover{ background:var(--brand); color:#fff; }
-    .hg-new-badge{ display:inline-block; background:#16A34A; color:#fff; font-size:.62rem; font-weight:700;
-      padding:2px 8px; border-radius:999px; letter-spacing:.3px; vertical-align:middle; margin-left:6px; }
     .hg-step-list{ max-width:760px; margin:0 auto; padding-left:1.3rem; counter-reset:hg-step; }
     .hg-step-list li{ margin-bottom:1.1rem; line-height:1.65; color:#475569; font-size:.92rem; padding-left:.3rem; }
     .hg-step-list li b{ color:#1E293B; }
@@ -368,6 +366,7 @@
     .notif-panel-title i { color:var(--brand); }
     .notif-panel-clear { font-size:.72rem; color:var(--brand); font-weight:700; cursor:pointer; border:none; background:none; padding:0; }
     .notif-panel-clear:disabled { color:#cbd5e1; cursor:default; }
+    .notif-panel-clear-all { font-size:.72rem; color:#dc2626; font-weight:700; cursor:pointer; border:none; background:none; padding:0; margin-left:14px; }
     .notif-panel-body { overflow-y:auto; padding:.5rem; }
     .notif-item { display:flex; gap:.7rem; padding:.65rem .6rem; border-radius:.65rem; align-items:flex-start; cursor:pointer; transition:.12s; }
     .notif-item:hover { background:var(--brand-light); }
@@ -377,6 +376,8 @@
     .notif-text { flex:1; min-width:0; }
     .notif-title { font-weight:700; font-size:.81rem; color:#1f2937; }
     .notif-desc { font-size:.76rem; color:#6b7280; line-height:1.4; margin-top:1px; }
+    .notif-del-btn { flex:0 0 auto; width:24px; height:24px; border:none; background:none; color:#cbd5e1; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:.72rem; margin-top:1px; }
+    .notif-del-btn:hover { color:#dc2626; background:#fee2e2; }
     .notif-empty { text-align:center; color:#94a1b2; font-size:.8rem; padding:2.2rem 1rem; }
     .notif-empty i { font-size:1.5rem; color:#cbd5e1; display:block; margin-bottom:8px; }
     @media(max-width:768px) { .notif-panel { display:none !important; } }
@@ -2062,7 +2063,7 @@
     <div class="reg-page-wrap" style="padding:2.5rem 1rem;">
       <div class="reg-page-card">
         <h1 class="reg-page-title">Syarat &amp; Ketentuan Penggunaan</h1>
-        <div class="terms-updated">Berlaku sejak Anda menyetujuinya saat pendaftaran &middot; Terakhir diperbarui: 2026</div>
+        <div class="terms-updated">Berlaku sejak Anda menyetujuinya saat pendaftaran &middot; Terakhir diperbarui: Juli 2026</div>
 
         <div class="terms-highlight">
           <i class="fas fa-circle-info me-1"></i>
@@ -2116,16 +2117,25 @@
           <h2>5. Ketersediaan &amp; Keutuhan Data</h2>
           <ul>
             <li>Data Anda disimpan di infrastruktur Google (Google Sheets/Google Drive) yang dikelola oleh Penyedia.
-            Penyedia berupaya menjaga keamanan dan ketersediaan data dengan wajar, namun <b>tidak memberikan jaminan
-            mutlak</b> atas keutuhan, keakuratan, atau ketersediaan data secara terus-menerus &mdash; baik akibat gangguan
-            dari pihak Google, kesalahan teknis, force majeure, maupun sebab lain di luar kendali wajar Penyedia.</li>
+            Untuk menjaga performa Layanan, data yang sudah cukup lama dapat secara otomatis diorganisasikan ke dalam
+            berkas terpisah (arsip) dalam infrastruktur yang sama &mdash; proses ini tidak mengubah kepemilikan maupun
+            hak akses Anda atas data tersebut, dan data yang diarsipkan tetap dapat dilihat kembali sewaktu-waktu
+            melalui Layanan. Penyedia berupaya menjaga keamanan dan ketersediaan data dengan wajar, namun <b>tidak
+            memberikan jaminan mutlak</b> atas keutuhan, keakuratan, atau ketersediaan data secara terus-menerus &mdash;
+            baik akibat gangguan dari pihak Google, kesalahan teknis, force majeure, maupun sebab lain di luar kendali
+            wajar Penyedia.</li>
+            <li>Layanan menyediakan sejumlah alat pemeliharaan data yang dapat digunakan Pengguna sendiri secara
+            mandiri &mdash; misalnya melihat indikator penggunaan kapasitas penyimpanan, mengarsipkan data tahun-tahun
+            sebelumnya, atau merapikan catatan utang/tagihan berulang yang sudah tidak aktif. Penggunaan alat-alat ini
+            bersifat opsional dan hasilnya menjadi tanggung jawab Pengguna sendiri.</li>
             <li>Penyedia sangat menyarankan Pengguna untuk sesekali mengekspor/mencadangkan (backup) data pentingnya
             sendiri secara mandiri. Penyedia tidak bertanggung jawab atas kehilangan, kerusakan, atau ketidaktersediaan
             data yang tidak dicadangkan sendiri oleh Pengguna.</li>
             <li>Untuk keperluan pemeliharaan, dukungan teknis, perbaikan bug, atau investigasi masalah, Penyedia dapat
-            mengakses data pada spreadsheet milik Pengguna sejauh diperlukan secara wajar, mengingat berkas data secara
-            teknis berada di dalam infrastruktur yang dikelola/dimiliki Penyedia. Akses ini hanya dilakukan untuk
-            keperluan operasional Layanan dan tidak dipergunakan untuk kepentingan lain di luar itu.</li>
+            mengakses data pada spreadsheet (termasuk berkas arsipnya) milik Pengguna sejauh diperlukan secara wajar,
+            mengingat berkas data secara teknis berada di dalam infrastruktur yang dikelola/dimiliki Penyedia. Akses
+            ini hanya dilakukan untuk keperluan operasional Layanan dan tidak dipergunakan untuk kepentingan lain di
+            luar itu.</li>
           </ul>
 
           <h2>6. Pembayaran &amp; Langganan</h2>
@@ -2296,8 +2306,8 @@
 
     <!-- ================= TRANSFER ANTAR AKUN ================= -->
     <div class="pl-section pl-section-tint" id="hg-transfer">
-      <div class="pl-section-title">🔁 Transfer Antar Akun <span class="hg-new-badge">BARU</span></div>
-      <p class="pl-section-sub">Fitur terbaru — akhirnya, tarik tunai &amp; pindah saldo tidak perlu lagi bikin Budget berantakan.</p>
+      <div class="pl-section-title">🔁 Transfer Antar Akun</div>
+      <p class="pl-section-sub">Tarik tunai &amp; pindah saldo antar akun, tanpa bikin Budget berantakan.</p>
       <ul class="hg-point-list">
         <li><b>Kapan dipakai?</b> Setiap kali uang cuma <i>pindah tempat</i> — bukan pengeluaran maupun pemasukan sungguhan. Contoh: tarik tunai dari ATM (Bank → Cash), atau pindah saldo antar rekening (BRI → CIMB Niaga).</li>
         <li><b>Cara pakainya.</b> Buka <b>Transfer Account</b> di sidebar (atau tombol "Transfer / Withdraw Cash" di halaman Accounts pada versi mobile), pilih akun asal &amp; tujuan, isi jumlahnya, selesai.</li>
@@ -2470,6 +2480,7 @@
     <div class="notif-panel-head">
       <div class="notif-panel-title"><i class="fas fa-bell"></i>Notifications</div>
       <button type="button" class="notif-panel-clear" id="notif-panel-clear-btn" onclick="markAllNotifsRead()">Mark all read</button>
+      <button type="button" class="notif-panel-clear-all" id="notif-panel-clear-all-btn" onclick="clearAllNotifs()">Delete all</button>
     </div>
     <div class="notif-panel-body" id="notif-panel-body"></div>
   </div>
@@ -3343,6 +3354,27 @@
               <thead><tr><th>Year</th><th>Status</th><th class="text-center" style="width:160px;">Action</th></tr></thead>
               <tbody id="archive-year-tbody"></tbody>
             </table>
+          </div>
+        </div></div>
+
+        <div class="card mt-3"><div class="card-body">
+          <h6 class="mb-3"><i class="fas fa-folder-tree me-1"></i>Archive Files</h6>
+          <div id="archive-files-body">
+            <div class="text-center text-muted py-2"><i class="fas fa-spinner fa-spin me-2"></i>Loading...</div>
+          </div>
+        </div></div>
+
+        <div class="card mt-3"><div class="card-body">
+          <h6 class="mb-3"><i class="fas fa-chart-simple me-1"></i>Storage Usage</h6>
+          <div id="quota-status-body">
+            <div class="text-center text-muted py-2"><i class="fas fa-spinner fa-spin me-2"></i>Loading...</div>
+          </div>
+        </div></div>
+
+        <div class="card mt-3"><div class="card-body">
+          <h6 class="mb-3"><i class="fas fa-broom me-1"></i>Maintenance</h6>
+          <div id="maintenance-status-body">
+            <div class="text-center text-muted py-2"><i class="fas fa-spinner fa-spin me-2"></i>Loading...</div>
           </div>
         </div></div>
       </div>
@@ -6422,10 +6454,16 @@ function initApp() {
   // yang benar (sebelumnya pakai default sementara).
   google.script.run
     .withSuccessHandler(function (res) {
-      if (res && res.success) { NOTIF_SETTINGS_CACHE = res.settings; updateNotifBadgeAndList(); }
+      if (res && res.success) { NOTIF_SETTINGS_CACHE = res.settings; }
+      notifInitMark_('settings');
     })
-    .withFailureHandler(function () {})
+    .withFailureHandler(function () { notifInitMark_('settings'); })
     .getReminderSettings(STATE.sessionToken);
+
+  // Ambil daftar id notifikasi yang sudah pernah di-delete (persisten di
+  // server) — supaya notifikasi yang sudah dihapus TIDAK muncul lagi begitu
+  // app dibuka ulang / ganti device. Tidak blocking render utama.
+  loadDismissedNotifIds_();
 }
 
 /* ==================================================================
@@ -6443,11 +6481,87 @@ var NOTIF_SEEN_KEY = 'monsco_notif_seen_v1';
 var NOTIF_SETTINGS_CACHE = { debtDaysBefore: 7, budgetThresholdPct: 80, recurringDaysBefore: 3 };
 var CURRENT_NOTIFS = [];
 
+/* BUG FIX "badge kedip lalu hilang saat login": initApp() menembak beberapa
+   request paralel (data tahun berjalan, reminder settings, daftar id yang
+   sudah di-dismiss) dan lebih dari satu di antaranya memanggil
+   updateNotifBadgeAndList() sendiri-sendiri begitu selesai — tidak saling
+   menunggu. Siapa pun yang selesai duluan menghitung ulang notif SEBELUM
+   daftar dismissed selesai di-load dari server, jadi notif yang sebenarnya
+   sudah pernah dihapus user sempat nongol lagi sesaat (badge merah kedip),
+   baru hilang lagi begitu daftar dismissed itu datang belakangan.
+   Fix: gerbang 3-flag ini memastikan updateNotifBadgeAndList() BENAR-BENAR
+   menghitung (bukan cuma dipanggil) hanya setelah ketiga sumber initial itu
+   sama-sama siap. notifInitMark_() dipakai MENGGANTIKAN pemanggilan
+   updateNotifBadgeAndList() langsung di titik-titik startup itu saja; di
+   luar initial load (mis. setelah save/delete transaksi, ganti tahun, dsb.)
+   semua flag sudah true sehingga updateNotifBadgeAndList() jalan seperti
+   biasa tanpa ada perubahan perilaku maupun request tambahan ke server. */
+var NOTIF_INIT_FLAGS = { data: false, settings: false, dismissed: false };
+function notifInitMark_(key) {
+  NOTIF_INIT_FLAGS[key] = true;
+  if (NOTIF_INIT_FLAGS.data && NOTIF_INIT_FLAGS.settings && NOTIF_INIT_FLAGS.dismissed) {
+    updateNotifBadgeAndList();
+  }
+}
+
 function mGetSeenNotifIds() {
   try { return JSON.parse(localStorage.getItem(NOTIF_SEEN_KEY) || '{}'); } catch (e) { return {}; }
 }
 function mSaveSeenNotifIds(obj) {
   try { localStorage.setItem(NOTIF_SEEN_KEY, JSON.stringify(obj)); } catch (e) {}
+}
+
+/* "Delete notification" untuk notifikasi reminder (debt due, budget
+   threshold, recurring due — dihitung LIVE oleh computeReminders(), bukan
+   record tersimpan) — BENAR-BENAR persisten di server (sheet
+   NOTIF_DISMISSED, per-tenant), bukan cuma localStorage per-device.
+   DISMISSED_NOTIF_IDS di sini murni cache lokal dari data server itu
+   (di-load sekali di initApp() lewat loadDismissedNotifIds_(), lalu
+   diperbarui optimis begitu user dismiss supaya UI langsung responsif
+   tanpa nunggu round-trip network). */
+var DISMISSED_NOTIF_IDS = {};
+function loadDismissedNotifIds_() {
+  google.script.run
+    .withSuccessHandler(function (res) {
+      if (!res || !res.success) { notifInitMark_('dismissed'); return; } // tetap tandai gerbang siap walau gagal, supaya tidak nyangkut selamanya
+      DISMISSED_NOTIF_IDS = {};
+      (res.ids || []).forEach(function (id) { DISMISSED_NOTIF_IDS[id] = true; });
+      notifInitMark_('dismissed');
+    })
+    .withFailureHandler(function (err) { console.error('loadDismissedNotifIds_ gagal: ' + err.message); notifInitMark_('dismissed'); })
+    .getDismissedNotifIds(STATE.sessionToken);
+}
+
+/* Hapus 1 notifikasi reminder. Update lokal dulu (optimistic) supaya UI
+   langsung responsif, baru kirim ke server di belakang; kalau gagal
+   tersimpan (jaringan putus dsb), dicatat ke console dan id-nya di-load
+   ulang dari server di sesi berikutnya (initApp -> loadDismissedNotifIds_)
+   sehingga tidak ada risiko "kelihatan terhapus di 1 sesi tapi balik lagi
+   nanti tanpa penjelasan" — konsisten dengan sumber kebenaran di server. */
+function dismissNotif(id) {
+  DISMISSED_NOTIF_IDS[id] = true;
+  updateNotifBadgeAndList();
+  google.script.run
+    .withFailureHandler(function (err) { console.error('dismissNotification gagal tersimpan ke server: ' + err.message); })
+    .dismissNotification(STATE.sessionToken, id);
+}
+
+/* Hapus SEMUA notifikasi reminder yang sedang tampil sekaligus — 1
+   panggilan server untuk semua id (bukan loop dismissNotification satu-satu
+   dari frontend). Pesan admin (isAdminMsg) TIDAK ikut terhapus di sini —
+   itu punya siklus baca/belum baca sendiri, lihat catatan di notifItemHtml_. */
+function clearAllNotifs() {
+  var ids = CURRENT_NOTIFS.filter(function (it) { return !it.isAdminMsg; }).map(function (it) { return it.id; });
+  ids.forEach(function (id) { DISMISSED_NOTIF_IDS[id] = true; });
+  updateNotifBadgeAndList();
+  var sheetEl = document.getElementById('m-sheet');
+  if (typeof mToast === 'function' && sheetEl && sheetEl.classList.contains('show')) {
+    mToast('All notifications deleted.', 'info');
+  }
+  if (!ids.length) return;
+  google.script.run
+    .withFailureHandler(function (err) { console.error('dismissNotifications gagal tersimpan ke server: ' + err.message); })
+    .dismissNotifications(STATE.sessionToken, ids);
 }
 
 /* Cari occurrence recurring BERIKUTNYA (strictly setelah hari ini) — logika
@@ -6656,6 +6770,7 @@ function notifItemHtml_(it, onclickFn) {
   return '<div class="notif-item" onclick="' + onclickFn + '(\'' + it.navTarget + '\')">' +
     '<div class="notif-icon ' + it.severity + '"><i class="fas ' + it.icon + '"></i></div>' +
     '<div class="notif-text"><div class="notif-title">' + escapeHtml(it.title) + '</div><div class="notif-desc">' + escapeHtml(it.text) + '</div></div>' +
+    '<button type="button" class="notif-del-btn" onclick="event.stopPropagation();dismissNotif(\'' + it.id + '\')" title="Delete"><i class="fas fa-xmark"></i></button>' +
   '</div>';
 }
 var NOTIF_EMPTY_HTML = '<div class="notif-empty"><i class="fas fa-bell-slash"></i>No notifications right now.</div>';
@@ -6723,7 +6838,15 @@ function openAdminMsgDetail(id) {
    Dipanggil tiap kali data baru masuk (applyLoadedData) DAN tiap kali
    pengaturan threshold disimpan ulang (Setup > Reminders). */
 function updateNotifBadgeAndList() {
-  CURRENT_NOTIFS = computeReminders().concat(ADMIN_MSGS_CACHE);
+  // "Delete" utk notifikasi reminder (bukan pesan admin) menyembunyikan
+  // dari LIST (dismiss) — computeReminders() selalu menghitung ulang LIVE
+  // dari data terkini, jadi filter DISMISSED_NOTIF_IDS ini yang membuat
+  // notif yang sudah "dihapus" tidak muncul lagi sampai fakta yang
+  // melatarinya berubah cukup jauh untuk menghasilkan id baru. Pesan admin
+  // (isAdminMsg) TIDAK ikut skema dismiss ini — itu punya siklus baca/belum
+  // baca sendiri (markAdminMessageRead), jadi tidak difilter di sini.
+  var liveReminders = computeReminders().filter(function (it) { return !DISMISSED_NOTIF_IDS[it.id]; });
+  CURRENT_NOTIFS = liveReminders.concat(ADMIN_MSGS_CACHE);
   var seen = mGetSeenNotifIds();
   var unseenCount = CURRENT_NOTIFS.filter(function (it) {
     return it.isAdminMsg ? !it.read : !seen[it.id];
@@ -6737,6 +6860,19 @@ function updateNotifBadgeAndList() {
   var panel = document.getElementById('notif-panel');
   var panelBody = document.getElementById('notif-panel-body');
   if (panel && panelBody && panel.classList.contains('show')) panelBody.innerHTML = renderNotifPanelBody();
+  // Sheet notifikasi MOBILE (#m-sheet-body, dibuka lewat mOpenNotifSheet())
+  // juga ikut di-refresh kalau sedang terbuka — supaya delete/dismiss dari
+  // mobile langsung kelihatan berubah, bukan cuma badge di belakang sheet.
+  var sheetEl = document.getElementById('m-sheet');
+  var sheetTitleText = document.getElementById('m-sheet-title-text');
+  if (sheetEl && sheetTitleText && sheetEl.classList.contains('show') && sheetTitleText.textContent.trim() === 'Notifications') {
+    document.getElementById('m-sheet-body').innerHTML =
+      '<div class="d-flex justify-content-end mb-2">' +
+        '<button type="button" class="notif-panel-clear" onclick="markAllNotifsRead()">Mark all read</button>' +
+        '<button type="button" class="notif-panel-clear-all" onclick="clearAllNotifs()">Delete all</button>' +
+      '</div>' +
+      renderNotifSheetBody();
+  }
 }
 
 function markAllNotifsRead() {
@@ -6780,7 +6916,10 @@ function closeNotifPanel() {
 function mOpenNotifSheet() {
   mOpenSheet('Notifications', 'fa-bell');
   document.getElementById('m-sheet-body').innerHTML =
-    '<div class="d-flex justify-content-end mb-2"><button type="button" class="notif-panel-clear" onclick="markAllNotifsRead()">Mark all read</button></div>' +
+    '<div class="d-flex justify-content-end mb-2">' +
+      '<button type="button" class="notif-panel-clear" onclick="markAllNotifsRead()">Mark all read</button>' +
+      '<button type="button" class="notif-panel-clear-all" onclick="clearAllNotifs()">Delete all</button>' +
+    '</div>' +
     renderNotifSheetBody();
   refreshAdminMsgs_();
 }
@@ -6879,7 +7018,7 @@ function applyLoadedData(res) {
   if (balMain) balMain.classList.remove('is-loading');
   _lastDataSnapshot = mSnapshotOf(res);
   mUpdateArchiveBanner();
-  updateNotifBadgeAndList();
+  notifInitMark_('data');
   // PERFORMA (stale-while-revalidate): simpan hasil load ini di localStorage
   // supaya buka app BERIKUTNYA bisa langsung tampilkan data ini SAMBIL
   // menunggu data segar dari server — lihat pemakaiannya di initApp().
@@ -15327,6 +15466,9 @@ function renderArchivePanel() {
   var tbody = document.getElementById('archive-year-tbody');
   if (!tbody) return;
   tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-3"><i class="fas fa-spinner fa-spin me-2"></i>Loading...</td></tr>';
+  renderQuotaStatus_('quota-status-body');
+  renderMaintenanceStatus_('maintenance-status-body');
+  renderArchiveFilesList_('archive-files-body');
   google.script.run
     .withSuccessHandler(function (res) {
       if (!res.success) { tbody.innerHTML = '<tr><td colspan="3" class="text-danger text-center py-3">' + (res.message || 'Failed to load.') + '</td></tr>'; return; }
@@ -15410,6 +15552,131 @@ function mUnarchiveYearConfirm(year) {
   });
 }
 
+/* ---- Storage quota & maintenance (dipakai bareng desktop & mobile) ----
+   Batas Google Sheets: 10 juta sel GABUNGAN semua tab per file, bukan per
+   tab dan bukan batas jumlah tab. Bagian ini murni pelaporan (quota) plus
+   2 aksi manual (arsip debt lunas / recurring nonaktif) — lihat catatan
+   di Kode.gs bagian "MAINTENANCE TAMBAHAN". ---- */
+function quotaBarHtml_(label, cells, limit, percent) {
+  if (cells == null) return '<div class="small text-muted mb-2">' + label + ': not available.</div>';
+  var barColor = percent >= 70 ? '#dc2626' : (percent >= 40 ? '#b45309' : '#15803d');
+  return '' +
+    '<div class="mb-2">' +
+      '<div class="d-flex justify-content-between small mb-1"><span>' + label + '</span><span>' + cells.toLocaleString() + ' / ' + limit.toLocaleString() + ' cells (' + percent + '%)</span></div>' +
+      '<div style="height:8px;border-radius:4px;background:#e9ecef;overflow:hidden;">' +
+        '<div style="height:100%;width:' + Math.min(100, percent) + '%;background:' + barColor + ';"></div>' +
+      '</div>' +
+    '</div>';
+}
+
+function renderQuotaStatus_(containerId) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  google.script.run
+    .withSuccessHandler(function (res) {
+      if (!res.success) { el.innerHTML = '<div class="text-danger small">' + (res.message || 'Failed to load.') + '</div>'; return; }
+      var html = quotaBarHtml_('Main file', res.mainCells, res.mainLimit, res.mainPercent);
+      (res.archiveFiles || []).forEach(function (af) {
+        html += quotaBarHtml_(af.label, af.cells, af.limit, af.percent);
+      });
+      el.innerHTML = html;
+    })
+    .withFailureHandler(function (err) { el.innerHTML = '<div class="text-danger small">' + (err.message || 'Failed to load.') + '</div>'; })
+    .getStorageQuotaStatus(STATE.sessionToken);
+}
+
+function renderMaintenanceStatus_(containerId) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  google.script.run
+    .withSuccessHandler(function (res) {
+      if (!res.success) { el.innerHTML = '<div class="text-danger small">' + (res.message || 'Failed to load.') + '</div>'; return; }
+      el.innerHTML =
+        '<div class="d-flex justify-content-between align-items-center mb-2">' +
+          '<div class="small">Paid-off debts ready to archive: <b>' + res.paidDebtCount + '</b></div>' +
+          (res.paidDebtCount > 0
+            ? '<button class="btn btn-sm btn-outline-danger" onclick="mArchivePaidDebtsConfirm()"><i class="fas fa-archive me-1"></i>Archive</button>'
+            : '<span class="text-muted small">Nothing to archive</span>') +
+        '</div>' +
+        '<div class="d-flex justify-content-between align-items-center">' +
+          '<div class="small">Inactive recurring ready to archive: <b>' + res.inactiveRecurringCount + '</b></div>' +
+          (res.inactiveRecurringCount > 0
+            ? '<button class="btn btn-sm btn-outline-danger" onclick="mArchiveInactiveRecurringConfirm()"><i class="fas fa-archive me-1"></i>Archive</button>'
+            : '<span class="text-muted small">Nothing to archive</span>') +
+        '</div>';
+    })
+    .withFailureHandler(function (err) { el.innerHTML = '<div class="text-danger small">' + (err.message || 'Failed to load.') + '</div>'; })
+    .getMaintenanceStatus(STATE.sessionToken);
+}
+
+function renderArchiveFilesList_(containerId) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  google.script.run
+    .withSuccessHandler(function (res) {
+      if (!res.success) { el.innerHTML = '<div class="text-danger small">' + (res.message || 'Failed to load.') + '</div>'; return; }
+      if (!res.files.length) { el.innerHTML = '<div class="text-muted small">No archive files yet — created automatically the first time a year is archived.</div>'; return; }
+      el.innerHTML = res.files.map(function (f) {
+        var nameHtml = f.url
+          ? '<a href="' + f.url + '" target="_blank" rel="noopener">' + f.name + '</a>'
+          : f.name;
+        return '<div class="d-flex justify-content-between align-items-center small mb-1">' +
+          '<span>' + f.decade + 's</span><span>' + nameHtml + '</span>' +
+        '</div>';
+      }).join('');
+    })
+    .withFailureHandler(function (err) { el.innerHTML = '<div class="text-danger small">' + (err.message || 'Failed to load.') + '</div>'; })
+    .getArchiveFilesStatus(STATE.sessionToken);
+}
+
+function mArchivePaidDebtsConfirm() {
+  mConfirm({
+    title: 'Archive paid-off debts?',
+    msg: 'Debts with a current balance of 0 will be moved to the Archive Spreadsheet (DEBT_ARCHIVE). They will no longer appear in your active debt list.',
+    okLabel: 'Yes, Archive', okStyle: 'danger', icon: 'box-archive', iconStyle: 'danger',
+    onOk: function () {
+      showLoad('Archiving paid-off debts...');
+      google.script.run
+        .withSuccessHandler(function (res) {
+          hideLoad();
+          if (!res.success) { mToast(res.message || 'Failed to archive.', 'error'); return; }
+          mToast(res.archived + ' debt(s) archived.', 'success');
+          renderMaintenanceStatus_('maintenance-status-body');
+          renderMaintenanceStatus_('maintenance-status-body-m');
+          renderQuotaStatus_('quota-status-body');
+          renderQuotaStatus_('quota-status-body-m');
+          loadDataForYear(STATE.year);
+        })
+        .withFailureHandler(function (err) { hideLoad(); mToast(err.message || 'Failed to archive.', 'error'); })
+        .archivePaidDebts(STATE.sessionToken);
+    }
+  });
+}
+
+function mArchiveInactiveRecurringConfirm() {
+  mConfirm({
+    title: 'Archive inactive recurring?',
+    msg: 'Recurring items that are inactive and whose end date has passed for a while will be moved to the Archive Spreadsheet (RECURRING_ARCHIVE).',
+    okLabel: 'Yes, Archive', okStyle: 'danger', icon: 'box-archive', iconStyle: 'danger',
+    onOk: function () {
+      showLoad('Archiving inactive recurring...');
+      google.script.run
+        .withSuccessHandler(function (res) {
+          hideLoad();
+          if (!res.success) { mToast(res.message || 'Failed to archive.', 'error'); return; }
+          mToast(res.archived + ' recurring item(s) archived.', 'success');
+          renderMaintenanceStatus_('maintenance-status-body');
+          renderMaintenanceStatus_('maintenance-status-body-m');
+          renderQuotaStatus_('quota-status-body');
+          renderQuotaStatus_('quota-status-body-m');
+          loadDataForYear(STATE.year);
+        })
+        .withFailureHandler(function (err) { hideLoad(); mToast(err.message || 'Failed to archive.', 'error'); })
+        .archiveInactiveRecurring(STATE.sessionToken);
+    }
+  });
+}
+
 /* ---- Versi MOBILE dari panel arsip — dibuka sebagai bottom sheet (m-sheet),
    bukan tab Setup desktop. Pakai endpoint server yang sama (getArchiveStatus,
    archiveYear, unarchiveYear), cuma beda gaya render (m-sec-view-row). ---- */
@@ -15449,7 +15716,18 @@ function mRenderArchiveSheet() {
             '<div><div class="m-sec-view-label">Year</div><div class="m-sec-view-value">' + r.year + ' ' + statusHtml + '</div></div>' +
             actionHtml +
           '</div>';
-        }).join('');
+        }).join('') +
+        '<hr class="my-3">' +
+        '<div class="fw-bold small mb-2"><i class="fas fa-folder-tree me-1"></i>Archive Files</div>' +
+        '<div id="archive-files-body-m" class="mb-3"><div class="text-center text-muted py-2"><i class="fas fa-spinner fa-spin me-2"></i>Loading...</div></div>' +
+        '<div class="fw-bold small mb-2"><i class="fas fa-chart-simple me-1"></i>Storage Usage</div>' +
+        '<div id="quota-status-body-m" class="mb-3"><div class="text-center text-muted py-2"><i class="fas fa-spinner fa-spin me-2"></i>Loading...</div></div>' +
+        '<div class="fw-bold small mb-2"><i class="fas fa-broom me-1"></i>Maintenance</div>' +
+        '<div id="maintenance-status-body-m"><div class="text-center text-muted py-2"><i class="fas fa-spinner fa-spin me-2"></i>Loading...</div></div>';
+
+      renderArchiveFilesList_('archive-files-body-m');
+      renderQuotaStatus_('quota-status-body-m');
+      renderMaintenanceStatus_('maintenance-status-body-m');
     })
     .withFailureHandler(function (err) {
       body.innerHTML = '<div class="text-danger text-center py-4">' + (err.message || 'Failed to load.') + '</div>';
