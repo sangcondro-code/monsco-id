@@ -3226,7 +3226,27 @@
       <div id="spanel-aiInsight" class="setup-panel d-none">
         <p class="empty-hint mb-3"><i class="fas fa-info-circle me-1"></i>AI Insight uses Google's Gemini API to generate narrative financial insights on demand (via the "Generate Insight" button on the Dashboard) — it is never called automatically, so it never burns API quota in the background.</p>
 
-        <!-- Shown when NO key is configured yet -->
+        <!-- BUG FIX: sebelumnya HANYA ada 2 keadaan di sini (form kosong /
+             "Configured" + tombol Remove), padahal server sebenarnya punya 3
+             keadaan (lihat mGetEffectiveGeminiApiKey_ & getAiInsightStatus_impl
+             di Kode.gs, field usingHouseKey): belum ada key sama sekali, key
+             MILIK tenant sendiri, atau otomatis jatuh ke house/shared key
+             milik admin saat tenant belum/tidak punya key sendiri. Dulu
+             frontend tidak pernah membaca usingHouseKey, jadi saat tenant
+             MENGHAPUS key miliknya sendiri sementara house key admin masih
+             ada, status langsung balik jadi "Configured" (karena house key
+             otomatis dipakai) — user melihat notifikasi "Removed" lalu
+             SEKETIKA tampilan balik ke "Configured" seolah penghapusannya
+             gagal/tidak tersimpan. Datanya sendiri sebenarnya AMAN terhapus;
+             ini murni salah tampil. Notice ini ditambahkan supaya "pakai
+             shared key admin" tidak lagi disamakan tampilannya dengan "key
+             saya sendiri terpasang". -->
+        <div class="alert alert-info d-none py-2 px-3 mb-3" id="ai-key-house-wrap" style="font-size:.8rem;">
+          <i class="fas fa-circle-info me-1"></i>You're currently using the shared/free Gemini key provided by the admin (you haven't set your own). Add your own key below anytime for dedicated quota.
+        </div>
+
+        <!-- Shown when NO key of your own is configured yet (may still be
+             using the shared house key above, or fully unconfigured) -->
         <div class="card d-none" id="ai-key-form-wrap"><div class="card-body">
           <div class="mb-3">
             <label class="form-label fw-bold small">Gemini API Key</label>
@@ -3241,11 +3261,12 @@
           <button class="btn fw-bold text-white" style="background:var(--brand);" onclick="saveGeminiKey()"><i class="fas fa-save me-1"></i>Save Key</button>
         </div></div>
 
-        <!-- Shown when a key IS already configured -->
+        <!-- Shown ONLY when the TENANT'S OWN key is configured (never for
+             the shared house-key fallback — see notice above) -->
         <div class="card d-none" id="ai-key-configured-wrap"><div class="card-body">
           <div class="d-flex align-items-center gap-2 mb-3">
             <span class="badge-grp" style="background:#dcfce7;color:#166534;"><i class="fas fa-check me-1"></i>Configured</span>
-            <span class="text-muted small">Gemini API key is set up and ready to use.</span>
+            <span class="text-muted small">Your own Gemini API key is set up and ready to use.</span>
           </div>
           <button class="btn btn-outline-danger" onclick="clearGeminiKey()"><i class="fas fa-trash me-1"></i>Remove Key</button>
         </div></div>
@@ -5145,7 +5166,17 @@
         window.visualViewport.addEventListener('resize', forceRepaint);
         window.visualViewport.addEventListener('scroll', forceRepaint);
       }
-      setInterval(forceRepaint, 400);
+      // PERBAIKAN PERFORMA: dulu ada setInterval(forceRepaint, 400) di sini,
+      // jadi forceRepaint() dipaksa jalan tiap 400ms SELAMANYA sepanjang
+      // sesi — bahkan saat layar sama sekali tidak berubah ukuran. Ini
+      // membebani main thread terus-menerus (tiap panggilan memicu style
+      // write + requestAnimationFrame), dan terasa paling berat di HP lama
+      // saat sedang ada kerja lain berbarengan (mis. simpan/hapus/edit
+      // transaksi). Listener resize/scroll/orientationchange/visualViewport
+      // di atas SUDAH cukup menangkap kasus toolbar Safari collapse/muncul
+      // yang jadi alasan awal forceRepaint ini dibuat — jadi polling buta
+      // tiap 400ms dihapus, bukan dikurangi frekuensinya, karena memang
+      // tidak diperlukan sama sekali.
     })();
   </script>
 
@@ -8723,7 +8754,19 @@ var M_VIEWS = ['home', 'analytics', 'pocket', 'pocket-detail', 'wealth', 'bank',
 /* Re-renders whichever mobile tab is currently active. Safe to call from   */
 /* desktop-only code paths too — it's a no-op if #m-shell isn't on screen.  */
 function refreshActiveMobileView() {
-  if (typeof renderMobileHome === 'function') renderMobileHome();
+  // PERBAIKAN PERFORMA: sebelumnya renderMobileHome() dipanggil TANPA SYARAT
+  // di sini — artinya setiap kali user simpan/edit/hapus SATU transaksi di
+  // halaman mana pun (Transactions, Budgeting, dst), Home tetap diam-diam
+  // dihitung ulang (filter seluruh transaksi setahun + rebuild daftar
+  // expense) dan di-render ulang walau halaman Home sedang tidak dibuka
+  // sama sekali. Ini kerja sia-sia yang paling terasa di HP lama, persis
+  // saat user sedang melakukan save/delete/edit. Pola guard yang benar
+  // (cek '.active' dulu) SUDAH dipakai di tempat lain pada file ini untuk
+  // Home — di sini disamakan supaya konsisten.
+  var homeView = document.getElementById('m-view-home');
+  if (homeView && homeView.classList.contains('active') && typeof renderMobileHome === 'function') {
+    renderMobileHome();
+  }
   var budView = document.getElementById('m-view-budgeting');
   if (budView && budView.classList.contains('active') && typeof renderMobileBudgeting === 'function') {
     renderMobileBudgeting();
@@ -16737,18 +16780,31 @@ function confirmDeleteSetup(type, id) {
 function fillAiInsightStatus() {
   var formWrap = document.getElementById('ai-key-form-wrap');
   var doneWrap = document.getElementById('ai-key-configured-wrap');
+  var houseWrap = document.getElementById('ai-key-house-wrap');
   if (!formWrap || !doneWrap) return;
   google.script.run
     .withSuccessHandler(function (res) {
       if (!res.success) return;
       STATE.aiInsightConfigured = !!res.configured;
-      formWrap.classList.toggle('d-none', res.configured);
-      doneWrap.classList.toggle('d-none', !res.configured);
+      // BUG FIX: "Configured" (badge hijau + tombol Remove) HANYA boleh
+      // tampil kalau KEY MILIK TENANT SENDIRI yang aktif — bukan saat
+      // res.configured bernilai true karena jatuh ke house/shared key admin
+      // (lihat mGetEffectiveGeminiApiKey_ di Kode.gs). Sebelumnya kode ini
+      // cuma baca res.configured saja, jadi setelah user menghapus key
+      // miliknya sendiri, status balik "Configured" lagi (karena house key
+      // otomatis dipakai) walau notifikasi "Removed" baru saja muncul —
+      // kelihatan seperti penghapusan gagal, padahal datanya sudah benar
+      // terhapus.
+      var ownKeyConfigured = res.configured && !res.usingHouseKey;
+      doneWrap.classList.toggle('d-none', !ownKeyConfigured);
+      formWrap.classList.toggle('d-none', ownKeyConfigured);
+      if (houseWrap) houseWrap.classList.toggle('d-none', !res.usingHouseKey || ownKeyConfigured);
     })
     .withFailureHandler(function () {
       // Gagal cek status — tampilkan form sebagai fallback aman
       formWrap.classList.remove('d-none');
       doneWrap.classList.add('d-none');
+      if (houseWrap) houseWrap.classList.add('d-none');
     })
     .getAiInsightStatus(STATE.sessionToken);
 }
@@ -17297,28 +17353,51 @@ var M_SEC_PASS_EDITING = false;
 function mOpenAiInsightSheet() {
   mOpenSheet('AI Insight', 'fa-wand-magic-sparkles');
   document.getElementById('m-sheet-body').innerHTML = '<p class="m-sheet-hint"><i class="fas fa-circle-info me-1"></i>Checking status...</p>';
+  mRefreshAiInsightSheet_();
+}
+
+// BUG FIX: dipisah jadi helper sendiri (dipakai saat sheet dibuka DAN
+// dipakai lagi setelah Remove Key berhasil) supaya status yang ditampilkan
+// SELALU tanya ulang ke server, bukan ditebak/dipaksa di client. Sebelumnya
+// mClearGeminiKey() langsung memaksa isConfigured=false secara optimis
+// tanpa tahu apakah house/shared key admin masih ada — begitu sheet ini
+// ditutup lalu dibuka lagi, statusnya balik jadi "Configured" (karena house
+// key otomatis dipakai), padahal user baru saja menghapus keynya sendiri
+// dan mengira itu masih tersimpan / penghapusan tidak berhasil.
+function mRefreshAiInsightSheet_() {
   google.script.run
     .withSuccessHandler(function (res) {
       STATE.aiInsightConfigured = !!(res.success && res.configured);
-      mRenderAiInsightSheet(STATE.aiInsightConfigured);
+      STATE.aiInsightUsingHouseKey = !!(res.success && res.usingHouseKey);
+      mRenderAiInsightSheet(STATE.aiInsightConfigured, STATE.aiInsightUsingHouseKey);
     })
-    .withFailureHandler(function () { mRenderAiInsightSheet(false); })
+    .withFailureHandler(function () { mRenderAiInsightSheet(false, false); })
     .getAiInsightStatus(STATE.sessionToken);
 }
 
-function mRenderAiInsightSheet(isConfigured) {
+function mRenderAiInsightSheet(isConfigured, usingHouseKey) {
   var body = document.getElementById('m-sheet-body');
   if (!body) return;
   var hint = '<p class="m-sheet-hint"><i class="fas fa-circle-info me-1"></i>AI Insight uses Google\'s Gemini API to generate narrative financial insights on demand — only when you tap "Generate" on the Analytics page, never automatically.</p>';
 
-  if (isConfigured) {
+  // BUG FIX: "Configured" (badge hijau + tombol Remove) HANYA untuk key
+  // MILIK SENDIRI. isConfigured bisa true walau user belum pernah set key
+  // apa pun, kalau house/shared key admin sedang dipakai sebagai fallback
+  // (lihat usingHouseKey, dikirim dari getAiInsightStatus_impl di Kode.gs) —
+  // keadaan itu HARUS tampil beda supaya tidak disalahartikan sebagai
+  // "key saya masih tersimpan".
+  var ownKeyConfigured = isConfigured && !usingHouseKey;
+
+  if (ownKeyConfigured) {
     body.innerHTML = hint +
-      '<div class="d-flex align-items-center gap-2 mb-3"><span class="badge-grp" style="background:#dcfce7;color:#166534;"><i class="fas fa-check me-1"></i>Configured</span><span class="text-muted small">Ready to use.</span></div>' +
+      '<div class="d-flex align-items-center gap-2 mb-3"><span class="badge-grp" style="background:#dcfce7;color:#166534;"><i class="fas fa-check me-1"></i>Configured</span><span class="text-muted small">Your own key is set up and ready to use.</span></div>' +
       '<div class="m-form-actions" style="border-top:none;padding-top:0;justify-content:flex-start;">' +
         '<button type="button" class="m-form-btn-reset" onclick="mClearGeminiKey()" style="width:auto;padding:0 16px;"><i class="fas fa-trash me-1"></i>Remove Key</button>' +
       '</div>';
   } else {
-    body.innerHTML = hint +
+    var houseNote = usingHouseKey ?
+      '<div class="m-sheet-hint mb-3" style="background:#eff6ff;border-color:#bfdbfe;color:#1e40af;"><i class="fas fa-circle-info me-1"></i>You\'re currently using the shared/free key provided by admin. Add your own below anytime for dedicated quota.</div>' : '';
+    body.innerHTML = hint + houseNote +
       '<div class="m-form-field"><label class="m-form-label">Gemini API Key</label>' +
         '<input type="password" class="m-form-input" id="m-ai-gemini-key" placeholder="Paste your Gemini API key here"></div>' +
       '<div class="m-sheet-hint mb-3" style="background:transparent;border:none;padding:0;">Don\'t have one? Get a free key at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com/app/apikey</a>.</div>' +
@@ -17338,7 +17417,8 @@ function mSaveGeminiKey() {
       hideLoad();
       if (!res.success) { mToast(res.message || 'Failed.', 'error'); return; }
       STATE.aiInsightConfigured = true;
-      mRenderAiInsightSheet(true);
+      STATE.aiInsightUsingHouseKey = false;
+      mRenderAiInsightSheet(true, false);
       mToast('Gemini API key saved!', 'success');
     })
     .withFailureHandler(function (err) { hideLoad(); mToast(err.message || 'Failed.', 'error'); })
@@ -17351,9 +17431,13 @@ function mClearGeminiKey() {
     .withSuccessHandler(function (res) {
       hideLoad();
       if (!res.success) { mToast(res.message || 'Failed.', 'error'); return; }
-      STATE.aiInsightConfigured = false;
-      mRenderAiInsightSheet(false);
       mToast('Gemini API key removed.', 'success');
+      // BUG FIX: tanya ulang status sungguhan ke server (bukan langsung
+      // memaksa isConfigured=false secara optimis) — supaya kalau house key
+      // admin masih ada, sheet ini LANGSUNG menampilkan keadaan "pakai
+      // shared key" yang benar, bukan diam-diam balik ke "Configured" nanti
+      // saat sheet dibuka ulang.
+      mRefreshAiInsightSheet_();
     })
     .withFailureHandler(function (err) { hideLoad(); mToast(err.message || 'Failed.', 'error'); })
     .saveGeminiApiKey(STATE.sessionToken, '');
